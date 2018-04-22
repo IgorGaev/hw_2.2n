@@ -1,7 +1,6 @@
 <?php
-$data = json_decode(file_get_contents(__DIR__ . '/alltests.json'), true);
-//print_r($data);
-//exit;
+ $testList = glob('tests/*.json');
+ //print_r($testList);
 ?>    
 <!doctype html>
 <html lang="ru">
@@ -15,18 +14,13 @@ $data = json_decode(file_get_contents(__DIR__ . '/alltests.json'), true);
     <body>
         <h2>Выберите тест</h2>
         <ol>
-            <?php foreach ($data as $numberTest => $test): ?>
+            <?php foreach ($testList as $numberTest => $test):
+                $testName = basename($test, ".json");?>
                 <li>
-                    Тест № <?= ++$numberTest ?>
+                    <a href="test.php?selectNumberTest=<?= ++$numberTest ?>"><?= $testName ?></a>
                 </li>
             <?php endforeach ?>
         </ol>
-        <form action="test.php" method="get">
-            <label>
-                <input type="text" name="selectNumberTest">
-            </label>
-            <input type="submit" value="Подтвердить">
-        </form>
         <a href="admin.php">К форме загрузки тестов</a>
     </body>
 </html>

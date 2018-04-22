@@ -1,6 +1,6 @@
 <?php
-$data = json_decode(file_get_contents(__DIR__ . '/alltests.json'), true);
-$testCount = count($data);
+$testList = glob('tests/*.json');
+$testCount = count($testList);
 
 if (array_key_exists('selectNumberTest', $_GET)) {
     $filter = FILTER_VALIDATE_INT; # задаем параметры фильтра
@@ -11,13 +11,12 @@ if (array_key_exists('selectNumberTest', $_GET)) {
         echo '404 Not Found';
         exit();
     } else {
-        $selectNumberTest = (int) $_GET['selectNumberTest'];
+        $questions = json_decode(file_get_contents(__DIR__ . '/tests/' . 'test' . $_GET['selectNumberTest'] . '.json'), true);
     }
 }
 
 if (!empty($_POST)) {
-    $i = $selectNumberTest - 1;
-    foreach ($data["$i"] as $numberTest => $quest) {
+    foreach ($questions as $numberTest => $quest) {
         $num = $numberTest + 1;
         if ($_POST["$numberTest"] == $quest['correctAnswerNum']) {
             echo "Ответ на " . $num . " вопрос правильный." . "</br>";
@@ -28,7 +27,6 @@ if (!empty($_POST)) {
     echo '<p><a href="list.php">К списку загруженных тестов</a></p>
     <p><a href="admin.php">К форме загрузки тестов</a></p>';
     exit;
-
 }
 ?>
 <!doctype html>
@@ -39,28 +37,21 @@ if (!empty($_POST)) {
     </head>
     <body>
         <?php
-        if (isset($selectNumberTest)) {
-            foreach ($data as $numberTest => $test) {
-                ++$numberTest;
-                if ($selectNumberTest === $numberTest) {
-                    echo '<h2>Тест №' . $numberTest . '</h2>';
-                    echo '<h3>Выберите правильный ответ:</h3>';
-                    foreach ($test as $numberQuest => $quest) {
-                        ?>
-                        <form method="POST">
-                            <fieldset>
-                                <legend><?= $numberQuest + 1 ?>.<?= $quest['question'] ?></legend>
-                                <?php foreach ($quest['answers'] as $numberAnswer => $answer) { ?>
-                                    <label><input name="<?= $numberQuest ?>" type="radio" value="<?= ++$numberAnswer ?>"><?= $answer ?></label>
-                                <?php } ?>
-                            </fieldset>
-                            <?php
-                        }
-                    }
+        if (isset( $questions)) {
+            echo '<h3>Выберите правильный ответ:</h3>';
+            foreach ($questions as $numberQuest => $quest) {
+                ?>
+                <form method="POST">
+                    <fieldset>
+                        <legend><?= $numberQuest + 1 ?>.<?= $quest['question'] ?></legend>
+                        <?php foreach ($quest['answers'] as $numberAnswer => $answer) { ?>
+                            <label><input name="<?= $numberQuest ?>" type="radio" value="<?= ++$numberAnswer ?>"><?= $answer ?></label>
+                        <?php } ?>
+                    </fieldset>
+                    <?php
                 }
             }
             ?>
-
             <input type="submit" value="Отправить">
         </form>       
     </body>

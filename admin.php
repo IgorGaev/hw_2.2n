@@ -1,24 +1,20 @@
 <?php
-if (!empty($_FILES)) {
+if (isset($_FILES['testfile']['tmp_name']) && file_exists($_FILES['testfile']['tmp_name'])) {
     $json = "json";
 
-    $fileName = $_FILES['testfile']['name'];
-    $explode = explode(".", $fileName);
+    $tempName = $_FILES['testfile']['tmp_name'];
+    $explode = explode(".", $_FILES['testfile']['name']);
 
-    if ($explode[1] !== $json) {
-        echo 'Можно загружать только файлы с разрешением json.';
+    if ($explode[1] == $json) {
+        if ($data = json_decode(file_get_contents($tempName), true)) {
+            $files = scandir('tests/');
+            $num_test = count($files) - 1;
+            if (move_uploaded_file($tempName, 'tests/' . 'Test' . $num_test . '.json')) {
+                echo "<p>Файл успешно загружен!</p>";
+            }
+        }
     } else {
-
-        move_uploaded_file($_FILES['testfile']['tmp_name'], 'temp.json');
-        $test = json_decode(file_get_contents(__DIR__ . '/temp.json'), true);
-        
-        $alltests = json_decode(file_get_contents(__DIR__ . '/alltests.json'), true);
-        
-        $alltests[]=$test;
-        file_put_contents('alltests.json', json_encode($alltests));
-        header('Location: list.php');
-
-        exit();
+        echo '<p>Ошибка! Можно загружать только файлы с разрешением json.</p>';
     }
 }
 ?>
@@ -35,5 +31,6 @@ if (!empty($_FILES)) {
             <p><input name="testfile" type="file"></p>
             <input type="submit" value="Загрузить">
         </form>
+        <a href="list.php">К списку загруженных тестов</a>
     </body>
 </html>
