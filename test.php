@@ -11,7 +11,7 @@ if (array_key_exists('selectNumberTest', $_GET)) {
         echo '404 Not Found';
         exit();
     } else {
-        $questions = json_decode(file_get_contents(__DIR__ . '/tests/' . 'test' . $_GET['selectNumberTest'] . '.json'), true);
+        $questions = json_decode(file_get_contents('tests/' . 'Test' . $_GET['selectNumberTest'] . '.json'), true);
     }
 }
 
